@@ -35,4 +35,28 @@ class WideDeep(nn.Module):
         )
     
     def forward(self,data):
-        
+        product_id_embed=self.product_embed(data['product_id'])
+        user_id_embed=self.user_embed(data['user_id'])
+        day_week_embed=self.day_week_embed(data['day_week'])
+        time_month_embed=self.month_embed(data['month'])
+        time_day_embed=self.time_day(data['time_day'])
+        rate=data['rate']
+
+        #feeding into wide
+        wide_outptut=self.wide(data['user_id'],data['product_id'])
+
+        #feeding into deep
+        deep_input=torch.cat((
+                product_id_embed,
+                user_id_embed,
+                day_week_embed,
+                time_month_embed,
+                time_day_embed,
+                rate
+        ))
+
+        #output of deep
+        deep_output=self.deep(deep_input)   
+                              
+        return torch.sigmoid(deep_output,wide_outptut)
+    
