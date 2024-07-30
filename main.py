@@ -6,39 +6,27 @@
 import torch
 import torch.nn as nn
 
-
-class Wide_Model(nn.Module):
-    '''
-    this the wide part of the model
-    '''
-    def __init__(self,n_inputs,n_outputs):
-        super().__init__()
-        self.layer=nn.Linear(n_inputs,n_outputs)
-
-    def forward(self,anime_id,genre,type,episodes,general_rating,members,user_id,user_rating):   
-        return self.layer(torch.cat(anime_id,genre,type,episodes,general_rating,members,user_id,user_rating))
-
-
-class Deep_Model(nn.Module):
-    """this make a deep neural network for the recommendation system
-
-    Args:
-        nn (module): for using torchs graph for forward and backward pass
+class WideDeep(nn.Module):
+    """the implementation of the wide and deep neural network based on the paper:
+            link:   https://arxiv.org/pdf/1606.07792v1
     """
-    def __init__(self,genre):
+    def __init__(self,num_product,num_users,rate,num_day_week,num_month,num_time_day,num_feature,embedding_dim=20):
         super().__init__()
-        
+
+        #wide
+        self.wide=nn.Linear(2,1)    #2 features are product id and customer id
+
         #lets setup the embedding
-        self.embedding=nn.Embedding(genre,torch.ceil(torch.sqrt(genre)))
-
+        self.product_embed=nn.Embedding(num_product,embedding_dim)
+        self.user_embed=nn.Embedding(num_users,embedding_dim)
+        self.day_week_embed=nn.Embedding(num_day_week,embedding_dim)
+        self.month_embed=nn.Embedding(num_month,embedding_dim)
+        self.time_day=nn.Embedding(num_time_day,embedding_dim)
         
-        # self.n_episode=torch.tensor(n_episodes)
-        # self.rating=torch.tenosr(rating)
-        # self.members=torch.tensor(members)
-
-        #setting up the neural netowrk part of the model
-        self.layers=nn.Sequential(
-            nn.Linear(7,1024),
+    
+        #deep
+        self.deep=nn.Sequential(
+            nn.Linear(num_feature,1024),
             nn.ReLU(),
             nn.Linear(1024,512),
             nn.ReLU(),
@@ -46,16 +34,5 @@ class Deep_Model(nn.Module):
             nn.Softmax()
         )
     
-    def forward(self,anime_id,genre,type,episodes,general_rating,members,user_id,user_rating):
-        #lets insert the categorical into numeric
-        embeding=self.embedding(genre)
-        total_inputs=torch.cat(anime_id,embeding,type,episodes,general_rating,members,user_id,user_rating)
-        return total_inputs
-    
-    class main_model(nn.Module):
-        def __init__(self,n_inputs,n_outputs,genre):
-            super().__init__()
-            self.wide=Wide_Model(n_inputs,n_outputs)  #initialize the model
-            self.deep=Deep_Model(genre)
+    def forward(self,data):
         
-        def forward(self,a):
