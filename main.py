@@ -1,8 +1,3 @@
-#todo:
- #build the encoder of the :
-    #build the wide model
-    #build the deep model
-
 import torch
 import torch.nn as nn
 from dataclasses import dataclass
@@ -47,20 +42,19 @@ class WideDeep(nn.Module):
             nn.ReLU(),
             nn.Linear(1024,512),
             nn.ReLU(),
-            nn.Linear(512,256),
+            nn.Linear(512,256),  #i think this one shoudl be 2 whether recomended or not
             nn.Softmax()
         )
     
-    def forward(self,data):
-        product_id_embed=self.product_embed(data['ProductId'])
-        user_id_embed=self.user_embed(data['UserId'])
-        day_week_embed=self.day_week_embed(data['day_of_week'])
-        time_month_embed=self.month_embed(data['month'])
-        time_day_embed=self.time_day(data['hour'])
-        rate=data['Score']
+    def forward(self,product_id,user_id,day_of_week,month,hour,rate):
+        product_id_embed=self.product_embed('ProductId')
+        user_id_embed=self.user_embed(user_id)
+        day_week_embed=self.day_week_embed(day_of_week)
+        time_month_embed=self.month_embed(month)
+        time_day_embed=self.time_day(hour)
 
         #feeding into wide
-        wide_outptut=self.wide(data['user_id'],data['product_id'])
+        wide_outptut=self.wide(product_id,user_id)
 
         #feeding into deep
         deep_input=torch.cat((
@@ -76,5 +70,3 @@ class WideDeep(nn.Module):
         deep_output=self.deep(deep_input)   
                               
         return torch.sigmoid(deep_output,wide_outptut)
-    
-
