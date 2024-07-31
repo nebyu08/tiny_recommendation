@@ -5,28 +5,44 @@
 
 import torch
 import torch.nn as nn
+from dataclasses import dataclass
+
+#setting up the simple configuration
+@dataclass
+class WD_Config:
+    num_product:int 
+    num_users:int 
+    num_day_week:int
+    num_month:int 
+    num_time_day:int
+    num_feature:int
+    embedding_dim:int
+
 
 class WideDeep(nn.Module):
     """the implementation of the wide and deep neural network based on the paper:
             link:   https://arxiv.org/pdf/1606.07792v1
     """
-    def __init__(self,num_product,num_users,rate,num_day_week,num_month,num_time_day,num_feature,embedding_dim=20):
+    def __init__(self,config:WD_Config):   #I removed the "rate"
         super().__init__()
+
+        #seetting up the config
+       # self.config=config
 
         #wide
         self.wide=nn.Linear(2,1)    #2 features are product id and customer id
 
         #lets setup the embedding
-        self.product_embed=nn.Embedding(num_product,embedding_dim)
-        self.user_embed=nn.Embedding(num_users,embedding_dim)
-        self.day_week_embed=nn.Embedding(num_day_week,embedding_dim)
-        self.month_embed=nn.Embedding(num_month,embedding_dim)
-        self.time_day=nn.Embedding(num_time_day,embedding_dim)
+        self.product_embed=nn.Embedding(config.num_product,config.embedding_dim)
+        self.user_embed=nn.Embedding(config.num_users,config.embedding_dim)
+        self.day_week_embed=nn.Embedding(config.num_day_week,config.embedding_dim)
+        self.month_embed=nn.Embedding(config.num_month,config.embedding_dim)
+        self.time_day=nn.Embedding(config.num_time_day,config.embedding_dim)
         
     
         #deep
         self.deep=nn.Sequential(
-            nn.Linear(num_feature,1024),
+            nn.Linear(config.num_feature,1024),
             nn.ReLU(),
             nn.Linear(1024,512),
             nn.ReLU(),
@@ -60,3 +76,17 @@ class WideDeep(nn.Module):
                               
         return torch.sigmoid(deep_output,wide_outptut)
     
+
+#assigin the config of the model
+config=WD_Config(
+    num_product= 100
+    num_users = 100
+    num_day_week = 7
+    num_month= 12
+    num_time_day= 24
+    num_feature =8
+    embedding_dim=40
+)
+
+#inserting the config into model
+WideDeep
