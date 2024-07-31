@@ -10,14 +10,14 @@ from dataclasses import dataclass
 #setting up the simple configuration
 @dataclass
 class WD_Config:
-    num_product:int 
-    num_users:int 
-    num_day_week:int
-    num_month:int 
-    num_time_day:int
-    num_feature:int
-    embedding_dim:int
-    year:int
+    num_product:int =100
+    num_users:int =100
+    num_day_week:int=7
+    num_month:int =12
+    num_time_day:int=24
+    num_feature:int=8
+    embedding_dim:int=40
+    num_year:int=2
 
 #main model
 class WideDeep(nn.Module):
@@ -38,7 +38,7 @@ class WideDeep(nn.Module):
         self.day_week_embed=nn.Embedding(config.num_day_week,config.embedding_dim)
         self.month_embed=nn.Embedding(config.num_month,config.embedding_dim)
         self.time_day=nn.Embedding(config.num_time_day,config.embedding_dim)
-        self.year=nn.Embedding(config.year,config.embedding_dim)
+        self.year=nn.Embedding(config.num_year,config.embedding_dim)
         
     
         #deep
@@ -77,16 +77,4 @@ class WideDeep(nn.Module):
                               
         return torch.sigmoid(deep_output,wide_outptut)
     
-
-#assigin the config of the model
-config=WD_Config(
-    num_product= 100
-    num_users = 100
-    num_day_week = 7
-    num_month= 12
-    num_time_day= 24
-    num_feature =8
-    embedding_dim=40
-)
-
 
