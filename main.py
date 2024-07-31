@@ -47,7 +47,7 @@ class WideDeep(nn.Module):
         )
     
     def forward(self,product_id,user_id,day_of_week,month,hour,rate):
-        product_id_embed=self.product_embed('ProductId')
+        product_id_embed=self.product_embed(product_id)
         user_id_embed=self.user_embed(user_id)
         day_week_embed=self.day_week_embed(day_of_week)
         time_month_embed=self.month_embed(month)
