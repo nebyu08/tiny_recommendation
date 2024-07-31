@@ -17,17 +17,17 @@ class WD_Config:
     num_time_day:int
     num_feature:int
     embedding_dim:int
+    year:int
 
 #main model
 class WideDeep(nn.Module):
     """the implementation of the wide and deep neural network based on the paper:
             link:   https://arxiv.org/pdf/1606.07792v1
     """
-    def __init__(self,config:WD_Config):   #I removed the "rate"
-        super().__init__()
+    def __init__(self,
+                 config:WD_Config):   #r emoved the "rate" input
 
-        #seetting up the config
-       # self.config=config
+        super().__init__()
 
         #wide
         self.wide=nn.Linear(2,1)    #2 features are product id and customer id
@@ -38,6 +38,7 @@ class WideDeep(nn.Module):
         self.day_week_embed=nn.Embedding(config.num_day_week,config.embedding_dim)
         self.month_embed=nn.Embedding(config.num_month,config.embedding_dim)
         self.time_day=nn.Embedding(config.num_time_day,config.embedding_dim)
+        self.year=nn.Embedding(config.year,config.embedding_dim)
         
     
         #deep
@@ -51,12 +52,12 @@ class WideDeep(nn.Module):
         )
     
     def forward(self,data):
-        product_id_embed=self.product_embed(data['product_id'])
-        user_id_embed=self.user_embed(data['user_id'])
-        day_week_embed=self.day_week_embed(data['day_week'])
+        product_id_embed=self.product_embed(data['ProductId'])
+        user_id_embed=self.user_embed(data['UserId'])
+        day_week_embed=self.day_week_embed(data['day_of_week'])
         time_month_embed=self.month_embed(data['month'])
-        time_day_embed=self.time_day(data['time_day'])
-        rate=data['rate']
+        time_day_embed=self.time_day(data['hour'])
+        rate=data['Score']
 
         #feeding into wide
         wide_outptut=self.wide(data['user_id'],data['product_id'])
