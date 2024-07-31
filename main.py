@@ -18,7 +18,7 @@ class WD_Config:
     num_feature:int
     embedding_dim:int
 
-
+#main model
 class WideDeep(nn.Module):
     """the implementation of the wide and deep neural network based on the paper:
             link:   https://arxiv.org/pdf/1606.07792v1
@@ -88,5 +88,4 @@ config=WD_Config(
     embedding_dim=40
 )
 
-#inserting the config into model
-WideDeep
+
