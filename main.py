@@ -10,10 +10,10 @@ from dataclasses import dataclass
 #setting up the simple configuration
 @dataclass
 class WD_Config:
-    num_product:int =100
-    num_users:int =100
+    num_product:int=100
+    num_users:int=100
     num_day_week:int=7
-    num_month:int =12
+    num_month:int=12
     num_time_day:int=24
     num_feature:int=8
     embedding_dim:int=40
