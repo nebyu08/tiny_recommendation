@@ -21,7 +21,7 @@ class WideDeep(nn.Module):
     """
     def __init__(self,
                  config:WD_Config):   #r emoved the "rate" input
-
+        
         super().__init__()
 
         #wide
@@ -71,4 +71,4 @@ class WideDeep(nn.Module):
         #output of deep
         deep_output=self.deep(deep_input)   
                               
-        return torch.sigmoid(deep_output,wide_outptut)
+        return torch.sigmoid(deep_output+wide_outptut)
