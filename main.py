@@ -10,7 +10,7 @@ class WD_Config:
     num_day_week:int=7
     num_month:int=12
     num_time_day:int=24
-    num_feature:int=8
+    num_feature:int=6  #there is no need for this
     embedding_dim:int=40
     num_year:int=2
 
@@ -46,7 +46,7 @@ class WideDeep(nn.Module):
             nn.Softmax()
         )
     
-    def forward(self,product_id,user_id,rate,year,month,day_of_week,hour):
+    def forward(self,product_id,user_id,year,month,day_of_week,hour):
         product_id_embed=self.product_embed(product_id)
         user_id_embed=self.user_embed(user_id)
         year_embed=self.year_embd(year)
@@ -64,8 +64,7 @@ class WideDeep(nn.Module):
                 year_embed,
                 time_month_embed,
                 day_week_embed,
-                time_day_embed,
-                rate
+                time_day_embed
         ))
 
         #output of deep
