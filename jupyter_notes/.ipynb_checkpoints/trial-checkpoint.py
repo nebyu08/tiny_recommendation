@@ -10,7 +10,7 @@ class WD_Config:
     num_day_week:int=7
     num_month:int=12
     num_time_day:int=24
-    num_feature:int=6  #there is no need for this
+    num_feature:int=8
     embedding_dim:int=40
     num_year:int=2
 
@@ -21,7 +21,7 @@ class WideDeep(nn.Module):
     """
     def __init__(self,
                  config:WD_Config):   #r emoved the "rate" input
-        
+
         super().__init__()
 
         #wide
@@ -32,8 +32,8 @@ class WideDeep(nn.Module):
         self.user_embed=nn.Embedding(config.num_users,config.embedding_dim)
         self.day_week_embed=nn.Embedding(config.num_day_week,config.embedding_dim)
         self.month_embed=nn.Embedding(config.num_month,config.embedding_dim)
-        self.time_day_embed=nn.Embedding(config.num_time_day,config.embedding_dim)
-        self.year_embd=nn.Embedding(config.num_year,config.embedding_dim)
+        self.time_day=nn.Embedding(config.num_time_day,config.embedding_dim)
+        self.year=nn.Embedding(config.num_year,config.embedding_dim)
         
     
         #deep
@@ -46,13 +46,12 @@ class WideDeep(nn.Module):
             nn.Softmax()
         )
     
-    def forward(self,product_id,user_id,year,month,day_of_week,hour):
+    def forward(self,product_id,user_id,day_of_week,month,hour,rate):
         product_id_embed=self.product_embed(product_id)
         user_id_embed=self.user_embed(user_id)
-        year_embed=self.year_embd(year)
-        time_month_embed=self.month_embed(month)
         day_week_embed=self.day_week_embed(day_of_week)
-        time_day_embed=self.time_day_embed(hour)
+        time_month_embed=self.month_embed(month)
+        time_day_embed=self.time_day(hour)
 
         #feeding into wide
         wide_outptut=self.wide(product_id,user_id)
@@ -61,13 +60,13 @@ class WideDeep(nn.Module):
         deep_input=torch.cat((
                 product_id_embed,
                 user_id_embed,
-                year_embed,
-                time_month_embed,
                 day_week_embed,
-                time_day_embed
-        ),dim=1)
+                time_month_embed,
+                time_day_embed,
+                rate
+        ))
 
         #output of deep
         deep_output=self.deep(deep_input)   
                               
-        return torch.sigmoid(deep_output+wide_outptut)
+        return torch.sigmoid(deep_output,wide_outptut)
