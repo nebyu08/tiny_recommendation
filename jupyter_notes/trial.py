@@ -47,14 +47,14 @@ class WideDeep(nn.Module):
 
         self.config=config #this is used for testing
     
-    def forward(self,product_id,user_id,year,month,day_of_week,hour,min_year,max_year):
+    def forward(self,product_id,user_id,year,month,day_of_week,hour):
         #lets insert some assertion here 
-        assert (product_id >= 0).all() and (product_id<self.config.num_product).all(), "product id is out of bound"
+        assert (product_id >= 0).all() and (product_id<self.config.num_product).all(),"product id is out of bound"
 
         assert (user_id>=0).all() and (user_id<self.config.num_users).all(),"user id is out of bound"
 
         #the year is different
-        assert (year>=min_year).all() and  (year<=max_year).all(),"year is out of bound" 
+        #assert (year>=min_year).all() and  (year<=max_year).all(),"year is out of bound" 
 
        
 
@@ -62,7 +62,7 @@ class WideDeep(nn.Module):
 
         assert (day_of_week>=0).all() and (day_of_week<self.config.num_day_week).all(),"day of week is out of bound"
 
-        assert (hour>=0).all() and (hour<=self.config.num_time_day).all(),"hour is out of bound"
+        #assert (hour>=0).all() and (hour<=self.config.num_time_day).all(),"hour is out of bound"
 
 
         #emebedding the input
