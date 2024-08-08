@@ -55,7 +55,7 @@ class WideDeep(nn.Module):
         time_day_embed=self.time_day_embed(hour)
 
         #feeding into wide
-        wide_outptut=self.wide(product_id,user_id)
+        wide_outptut=self.wide(product_id,user_id) 
 
         #feeding into deep
         deep_input=torch.cat((
