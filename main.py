@@ -47,13 +47,16 @@ class WideDeep(nn.Module):
 
         self.config=config #this is used for testing
     
-    def forward(self,product_id,user_id,year,month,day_of_week,hour):
+    def forward(self,product_id,user_id,year,month,day_of_week,hour,min_year,max_year):
         #lets insert some assertion here 
         assert (product_id >= 0).all() and (product_id<self.config.num_product).all(), "product id is out of bound"
 
         assert (user_id>=0).all() and (user_id<self.config.num_users).all(),"user id is out of bound"
 
-        assert (year>=0).all() and (year<self.config.num_year).all(),"year is out of bound"
+        #the year is different
+        assert (year>=min_year).all() and  (year<=max_year).all(),"year is out of bound" 
+
+       
 
         assert (month>=0).all() and (month<self.config.num_month).all(),"month is out of bound"
 
