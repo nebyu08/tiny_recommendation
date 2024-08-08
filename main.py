@@ -43,7 +43,6 @@ class WideDeep(nn.Module):
             nn.Linear(1024,512),
             nn.ReLU(),
             nn.Linear(512,256),  #i think this one shoudl be 2 whether recomended or not
-            nn.Softmax()
         )
     
     def forward(self,product_id,user_id,year,month,day_of_week,hour):
@@ -55,7 +54,7 @@ class WideDeep(nn.Module):
         time_day_embed=self.time_day_embed(hour)
 
         #feeding into wide
-        wide_outptut=self.wide(product_id,user_id) 
+        wide_outptut=self.wide(torch.cat([product_id.float(),user_id.float()],dim=1))      #inputs are floats cause ouputs must be floats not torch long 
 
         #feeding into deep
         deep_input=torch.cat((
