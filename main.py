@@ -20,7 +20,7 @@ class WideDeep(nn.Module):
             link:   https://arxiv.org/pdf/1606.07792v1
     """
     def __init__(self,
-                 config:WD_Config):   #r emoved the "rate" input
+                 config): 
         
         super().__init__()
 
@@ -44,8 +44,25 @@ class WideDeep(nn.Module):
             nn.ReLU(),
             nn.Linear(512,2),  
         )
+
+        self.config=config #this is used for testing
     
     def forward(self,product_id,user_id,year,month,day_of_week,hour):
+        #lets insert some assertion here 
+        assert (product_id >= 0).all() and (product_id<self.config.num_product).all(), "product id is out of bound"
+
+        assert (user_id>=0).all() and (user_id<self.config.num_users).all(),"user id is out of bound"
+
+        assert (year>=0).all() and (year<self.config.num_year).all(),"year is out of bound"
+
+        assert (month>=0).all() and (month<self.config.num_month).all(),"month is out of bound"
+
+        assert (day_of_week>=0).all() and (day_of_week<self.config.num_day_week).all(),"day of week is out of bound"
+
+        assert (hour>=0).all() and (hour<self.config.num_time_day).all(),"hour is out of bound"
+
+
+        #emebedding the input
         product_id_embed=self.product_embed(product_id)
         user_id_embed=self.user_embed(user_id)
         year_embed=self.year_embd(year)
