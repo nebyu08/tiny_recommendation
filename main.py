@@ -108,6 +108,6 @@ class WideDeep(nn.Module):
 
     #lets initialize the model
     def _initialize_weights(self):
-        for layer in self.models:
+        for layer in self.deep:
             if isinstance(layer,nn.Linear):
                 nn.init.xavier_uniform_(layer.weight)
