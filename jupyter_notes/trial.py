@@ -37,7 +37,7 @@ class WideDeep(nn.Module):
            
         #deep
         self.deep=nn.Sequential(
-            nn.Linear(config.num_feature,1024), 
+            nn.Linear(600,1024), #config.num_feature
             nn.ReLU(),
             nn.Linear(1024,512),
             nn.ReLU(),
@@ -77,19 +77,25 @@ class WideDeep(nn.Module):
         print(time_day_embed.shape)
 
         #feeding into wide
+        
+        #lets add more dims to the inputs
+        #product_id=product_id.unsqueeze(dim=1)
+        #user_id=user_id.unsqueeze(dim=1)
+
         wide_output=self.wide(torch.cat([product_id.float(),user_id.float()],dim=1))      #inputs are floats cause ouputs must be floats not torch long 
 
         #feeding into deep but the shapes needs to be adjusted
         deep_input=torch.cat((
-                product_id_embed,
-                user_id_embed,
-                year_embed,
-                time_month_embed,
-                day_week_embed,
-                time_day_embed
+                product_id_embed.view(product_id_embed.size(0),-1),
+                user_id_embed.view(user_id_embed.size(0),-1),
+                year_embed.view(year_embed.size(0),-1),
+                time_month_embed.view(time_month_embed.size(0),-1),
+                day_week_embed.view(day_week_embed.size(0),-1),
+                time_day_embed.view(time_day_embed.size(0),-1)
         ),dim=1)
 
         #output shape of the input to the deep
+        print("hello from model")
         print(deep_input.shape) 
 
         #output of deep
