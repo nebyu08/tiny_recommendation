@@ -81,12 +81,12 @@ class WideDeep(nn.Module):
 
         #feeding into deep but the shapes needs to be adjusted
         deep_input=torch.cat((
-                product_id_embed.view(product_id_embed.size(0),-1),
-                user_id_embed.view(product_id_embed.size(0),-1),
-                year_embed.view(year_embed.size(0),-1),
-                time_month_embed.view(time_month_embed.size(0),-1),
-                day_week_embed.view(day_week_embed.size(0),-1),
-                time_day_embed.view(time_day_embed.size(0),-1)
+                product_id_embed,
+                user_id_embed,
+                year_embed,
+                time_month_embed,
+                day_week_embed,
+                time_day_embed
         ),dim=1)
 
         #output shape of the input to the deep
