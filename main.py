@@ -41,8 +41,11 @@ class WideDeep(nn.Module):
             nn.ReLU(),
             nn.Linear(1024,512),
             nn.ReLU(),
-            nn.Linear(512,2)
+            nn.Linear(512,1)
         )
+        #initializing the weights
+        self._initialize_weights()
+
         self.config=config #this is used for testing
     
     def forward(self,product_id,user_id,year,month,day_of_week,hour):
@@ -70,11 +73,11 @@ class WideDeep(nn.Module):
         time_day_embed=self.time_day_embed(hour)
 
         #debug
-        print("hello from inside model")
-        print(product_id_embed.shape)
-        print(user_id_embed.shape)
-        print(year_embed.shape)
-        print(time_day_embed.shape)
+        #print("hello from inside model")
+        #print(product_id_embed.shape)
+        #print(user_id_embed.shape)
+        #print(year_embed.shape)
+        #print(time_day_embed.shape)
 
         #feeding into wide
         
@@ -95,10 +98,16 @@ class WideDeep(nn.Module):
         ),dim=1)
 
         #output shape of the input to the deep
-        print("hello from model")
-        print(deep_input.shape) 
+        #print("hello from model")
+        #print(deep_input.shape) 
 
         #output of deep
         deep_output=self.deep(deep_input)   
                               
         return torch.sigmoid(deep_output+wide_output)
+
+    #lets initialize the model
+    def _initialize_weights(self):
+        for layer in self.models:
+            if isinstance(layer,nn.Linear):
+                nn.init.xavier_uniform_(layer.weight)
