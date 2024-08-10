@@ -37,7 +37,7 @@ class WideDeep(nn.Module):
            
         #deep
         self.deep=nn.Sequential(
-            nn.Linear(600,1024), #config.num_feature
+            nn.Linear(config.embedding_dim*6,1024), #config.num_feature
             nn.ReLU(),
             nn.Linear(1024,512),
             nn.ReLU(),
@@ -104,10 +104,14 @@ class WideDeep(nn.Module):
         #output of deep
         deep_output=self.deep(deep_input)   
                               
-        return torch.sigmoid(deep_output+wide_output)
+        return deep_output+wide_output  #didn't include sigmoid because am using torch bce with logits as loss
 
     #lets initialize the model
     def _initialize_weights(self):
         for layer in self.deep:
             if isinstance(layer,nn.Linear):
                 nn.init.xavier_uniform_(layer.weight)
+        for layer in self.wide:
+            if isinstance(layer,nn.Linear):
+                nn.init.xavier_uniform_(layer.weight)
+        
