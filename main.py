@@ -112,26 +112,6 @@ class WideDeep(nn.Module):
         day_week_embed=self.day_week_embed(day_of_week)
         time_day_embed=self.time_day_embed(hour)
 
-       
-
-        #display the input
-        print(f"product id:{product_id}")
-        print(f"user if:{user_id}")
-        print(f"year:{year}")
-        print(f"month :{month}")
-        print(f"day of week:{day_of_week}")
-        print(f"hour :{hour}")
-
-        #lets check out the embedding
-        print(f"product embed: {product_id_embed}")
-        print(f"user id embed {user_id_embed}")
-        print(f"year embed {year_embed}")
-        print(f"time month embed {time_month_embed}")
-        print(f"day of week embed {day_week_embed}")
-        print(f"tmie of day embed {time_day_embed}")
-        
-
-
         wide_output=self.wide(torch.cat((product_id.float(),user_id.float()),dim=1))      #inputs are floats cause ouputs must be floats not torch long 
 
         #feeding into deep but the shapes needs to be adjusted
@@ -145,12 +125,7 @@ class WideDeep(nn.Module):
         ),dim=1)
 
         deep_output=self.deep(deep_input)   
-
-        #lets print the intermediate values
-        
-        print(f"wide-output: {wide_output}")
-        print(f"deep-output: {deep_output}")
-                              
+                                      
         return deep_output+wide_output  #didn't include sigmoid because am using torch bce with logits as loss
 
     #lets initialize the model
