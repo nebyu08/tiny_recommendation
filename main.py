@@ -86,22 +86,22 @@ class WideDeep(nn.Module):
 
 
        #lets assert that inputs are not nan
-        if not torch.isnan(product_id).any():
+        if torch.isnan(product_id).any():
             warnings.warn("there is a nan value in product id")
 
-        if not torch.isnan(user_id).any():
+        if torch.isnan(user_id).any():
             warnings.warn("there is a nan value in user id")
 
-        if not torch.isnan(year).any():
+        if torch.isnan(year).any():
             warnings.warn("there is a nan value in year")
 
-        if not torch.isnan(month).any():
+        if torch.isnan(month).any():
             warnings.warn("thre is a nan value in month")
 
-        if not torch.isnan(day_of_week).any():
+        if torch.isnan(day_of_week).any():
             warnings.warn("there is a nan value in day of week")
 
-        if not torch.isnan(hour).any():
+        if torch.isnan(hour).any():
             warnings.warn("there is a nan value in the hour")
 
         #emebedding the input
@@ -125,7 +125,7 @@ class WideDeep(nn.Module):
         ),dim=1)
 
         deep_output=self.deep(deep_input)   
-                                      
+
         return deep_output+wide_output  #didn't include sigmoid because am using torch bce with logits as loss
 
     #lets initialize the model
