@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import warnings
 from dataclasses import dataclass
 
 #setting up the simple configuration
@@ -41,7 +42,7 @@ class WideDeep(nn.Module):
             nn.ReLU(),
             nn.Linear(1024,512),
             nn.ReLU(),
-            nn.Linear(512,1)
+            nn.Linear(512,257)
         )
         #initializing the weights
         self._initialize_weights()
@@ -49,20 +50,43 @@ class WideDeep(nn.Module):
         self.config=config #this is used for testing
     
     def forward(self,product_id,user_id,year,month,day_of_week,hour):
-        #lets insert some assertion here 
-        assert (product_id >= 0).all() and (product_id<self.config.num_product).all(), "product id is out of bound"
 
-        assert (user_id>=0).all() and (user_id<self.config.num_users).all(),"user id is out of bound"
+        #lets insert some range of inputs 
+        if (product_id >= 0).all() and (product_id<self.config.num_product).all():
+            warnings.warn("product id is out of bound")
+
+        if (user_id>=0).all() and (user_id<self.config.num_users).all():
+            warnings.warn("user id is out of bound")
 
         #the year is different
         #assert (year>=min_year).all() and  (year<=max_year).all(),"year is out of bound" 
 
-        assert (month>=0).all() and (month<self.config.num_month).all(),"month is out of bound"
+        if (month>=0).all() and (month<self.config.num_month).all():
+            warnings.warn("month is out of bound")
 
-        assert (day_of_week>=0).all() and (day_of_week<self.config.num_day_week).all(),"day of week is out of bound"
+        if(day_of_week>=0).all() and (day_of_week<self.config.num_day_week).all():
+            warnings.warn("day of week is out of bound")
 
        # assert (hour>=0).all() and (hour<self.config.num_time_day).all(),"hour is out of bound"
 
+       #lets assert that inputs are not nan
+        if not torch.isnan(product_id).any():
+            warnings.warn("there is a nan value in product id")
+
+        if not torch.isnan(user_id).any():
+            warnings.warn("there is a nan value in user id")
+
+        if not torch.isnan(year).any():
+            warnings.warn("there is a nan value in year")
+
+        if not torch.isnan(month).any():
+            warnings.warn("thre is a nan value in month")
+
+        if not torch.isnan(day_of_week).any():
+            warnings.warn("there is a nan value in day of week")
+
+        if not torch.isnan(hour).any():
+            warnings.warn("there is a nan value in the hour")
 
         #emebedding the input
         product_id_embed=self.product_embed(product_id)
@@ -85,7 +109,16 @@ class WideDeep(nn.Module):
         #product_id=product_id.unsqueeze(dim=1)
         #user_id=user_id.unsqueeze(dim=1)
 
-        wide_output=self.wide(torch.cat([product_id.float(),user_id.float()],dim=1))      #inputs are floats cause ouputs must be floats not torch long 
+        #display the input
+        print(f"product id:{product_id}")
+        print(f"user if:{user_id}")
+        print(f"year:{year}")
+        print(f"month :{month}")
+        print(f"day of week:{day_of_week}")
+        print(f"hour :{hour}")
+
+
+        wide_output=self.wide(torch.cat((product_id.float(),user_id.float()),dim=1))      #inputs are floats cause ouputs must be floats not torch long 
 
         #feeding into deep but the shapes needs to be adjusted
         deep_input=torch.cat((
@@ -102,16 +135,21 @@ class WideDeep(nn.Module):
         #print(deep_input.shape) 
 
         #output of deep
+
         deep_output=self.deep(deep_input)   
+
+        #lets print the intermediate values
+        
+        print(f"wide-output: {wide_output}")
+        print(f"deep-output: {deep_output}")
                               
         return deep_output+wide_output  #didn't include sigmoid because am using torch bce with logits as loss
 
     #lets initialize the model
     def _initialize_weights(self):
+
         for layer in self.deep:
             if isinstance(layer,nn.Linear):
                 nn.init.xavier_uniform_(layer.weight)
-        for layer in self.wide:
-            if isinstance(layer,nn.Linear):
-                nn.init.xavier_uniform_(layer.weight)
         
+        nn.init.xavier_uniform_(self.wide.weight)
