@@ -35,6 +35,14 @@ class WideDeep(nn.Module):
         self.month_embed=nn.Embedding(config.num_month,config.embedding_dim)
         self.time_day_embed=nn.Embedding(config.num_time_day,config.embedding_dim)
         self.year_embd=nn.Embedding(config.num_year,config.embedding_dim)
+
+        #lets initialize the embedding
+        self.product_embed.weight.data.uniform_(-1,1)
+        self.user_embed.weight.data.uniform_(-1,1)
+        self.day_week_embed.weight.data.uniform_(-1,1)
+        self.month_embed.weight.data.uniform_(-1,1)
+        self.time_day_embed.weight.data.uniform_(-1,1)
+        self.year_embd.weight.data.uniform_(-1,1)   
            
         #deep
         self.deep=nn.Sequential(
@@ -45,15 +53,14 @@ class WideDeep(nn.Module):
             nn.Linear(512,216),
             nn.ReLU(),
             nn.Linear(216,200),
-            nn.ReLU()
+            nn.ReLU(),
             nn.Linear(200,128),
             nn.ReLU(),
             nn.Linear(128,80),
             nn.ReLU(),
             nn.Linear(80,10),
-            nn.ReLU()
+            nn.ReLU(),
             nn.Linear(10,1)
-
         )
         
 
@@ -115,6 +122,15 @@ class WideDeep(nn.Module):
         print(f"day of week:{day_of_week}")
         print(f"hour :{hour}")
 
+        #lets check out the embedding
+        print(f"product embed: {product_id_embed}")
+        print(f"user id embed {user_id_embed}")
+        print(f"year embed {year_embed}")
+        print(f"time month embed {time_month_embed}")
+        print(f"day of week embed {day_week_embed}")
+        print(f"tmie of day embed {time_day_embed}")
+        
+
 
         wide_output=self.wide(torch.cat((product_id.float(),user_id.float()),dim=1))      #inputs are floats cause ouputs must be floats not torch long 
 
@@ -127,8 +143,6 @@ class WideDeep(nn.Module):
                 day_week_embed.view(day_week_embed.size(0),-1),
                 time_day_embed.view(time_day_embed.size(0),-1)
         ),dim=1)
-
-      
 
         deep_output=self.deep(deep_input)   
 
