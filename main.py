@@ -65,16 +65,16 @@ class WideDeep(nn.Module):
     def forward(self,product_id,user_id,year,month,day_of_week,hour):
 
         #lets insert some range of inputs 
-        if (product_id >= 0).all() and (product_id<self.config.num_product).all():
+        if not (product_id >= 0).all() and (product_id<self.config.num_product).all():
             warnings.warn("product id is out of bound")
 
-        if (user_id>=0).all() and (user_id<self.config.num_users).all():
+        if not (user_id>=0).all() and (user_id<self.config.num_users).all():
             warnings.warn("user id is out of bound")
 
-        if (month>=0).all() and (month<self.config.num_month).all():
+        if not (month>=0).all() and (month<self.config.num_month).all():
             warnings.warn("month is out of bound")
 
-        if(day_of_week>=0).all() and (day_of_week<self.config.num_day_week).all():
+        if not (day_of_week>=0).all() and (day_of_week<self.config.num_day_week).all():
             warnings.warn("day of week is out of bound")
 
 
