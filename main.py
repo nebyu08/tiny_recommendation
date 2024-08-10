@@ -42,8 +42,21 @@ class WideDeep(nn.Module):
             nn.ReLU(),
             nn.Linear(1024,512),
             nn.ReLU(),
-            nn.Linear(512,257)
+            nn.Linear(512,216),
+            nn.ReLU(),
+            nn.Linear(216,200),
+            nn.ReLU()
+            nn.Linear(200,128),
+            nn.ReLU(),
+            nn.Linear(128,80),
+            nn.ReLU(),
+            nn.Linear(80,10),
+            nn.ReLU()
+            nn.Linear(10,1)
+
         )
+        
+
         #initializing the weights
         self._initialize_weights()
 
@@ -58,16 +71,12 @@ class WideDeep(nn.Module):
         if (user_id>=0).all() and (user_id<self.config.num_users).all():
             warnings.warn("user id is out of bound")
 
-        #the year is different
-        #assert (year>=min_year).all() and  (year<=max_year).all(),"year is out of bound" 
-
         if (month>=0).all() and (month<self.config.num_month).all():
             warnings.warn("month is out of bound")
 
         if(day_of_week>=0).all() and (day_of_week<self.config.num_day_week).all():
             warnings.warn("day of week is out of bound")
 
-       # assert (hour>=0).all() and (hour<self.config.num_time_day).all(),"hour is out of bound"
 
        #lets assert that inputs are not nan
         if not torch.isnan(product_id).any():
@@ -96,18 +105,7 @@ class WideDeep(nn.Module):
         day_week_embed=self.day_week_embed(day_of_week)
         time_day_embed=self.time_day_embed(hour)
 
-        #debug
-        #print("hello from inside model")
-        #print(product_id_embed.shape)
-        #print(user_id_embed.shape)
-        #print(year_embed.shape)
-        #print(time_day_embed.shape)
-
-        #feeding into wide
-        
-        #lets add more dims to the inputs
-        #product_id=product_id.unsqueeze(dim=1)
-        #user_id=user_id.unsqueeze(dim=1)
+       
 
         #display the input
         print(f"product id:{product_id}")
@@ -130,11 +128,7 @@ class WideDeep(nn.Module):
                 time_day_embed.view(time_day_embed.size(0),-1)
         ),dim=1)
 
-        #output shape of the input to the deep
-        #print("hello from model")
-        #print(deep_input.shape) 
-
-        #output of deep
+      
 
         deep_output=self.deep(deep_input)   
 
