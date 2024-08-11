@@ -68,7 +68,7 @@ class WideDeep(nn.Module):
 
             nn.Linear(128,80),
             nn.ReLU(),
-            nn.Dropout()
+            nn.Dropout(),
 
             nn.Linear(80,10),
             nn.ReLU(),
