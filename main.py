@@ -48,16 +48,28 @@ class WideDeep(nn.Module):
         self.deep=nn.Sequential(
             nn.Linear(config.embedding_dim*6,1024), #config.num_feature
             nn.ReLU(),
+            nn.Dropout(),
+
             nn.Linear(1024,512),
             nn.ReLU(),
+            nn.Dropout(),
+
             nn.Linear(512,216),
             nn.ReLU(),
+            nn.Dropout(),
+
             nn.Linear(216,200),
             nn.ReLU(),
+            nn.Dropout(),
+
             nn.Linear(200,128),
             nn.ReLU(),
+            nn.Dropout(),
+
             nn.Linear(128,80),
             nn.ReLU(),
+            nn.Dropout()
+
             nn.Linear(80,10),
             nn.ReLU(),
             nn.Linear(10,1)
