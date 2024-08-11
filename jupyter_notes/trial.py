@@ -35,6 +35,14 @@ class WideDeep(nn.Module):
         self.month_embed=nn.Embedding(config.num_month,config.embedding_dim)
         self.time_day_embed=nn.Embedding(config.num_time_day,config.embedding_dim)
         self.year_embd=nn.Embedding(config.num_year,config.embedding_dim)
+
+        #lets initialize the embedding
+        self.product_embed.weight.data.uniform_(-1,1)
+        self.user_embed.weight.data.uniform_(-1,1)
+        self.day_week_embed.weight.data.uniform_(-1,1)
+        self.month_embed.weight.data.uniform_(-1,1)
+        self.time_day_embed.weight.data.uniform_(-1,1)
+        self.year_embd.weight.data.uniform_(-1,1)   
            
         #deep
         self.deep=nn.Sequential(
@@ -42,8 +50,20 @@ class WideDeep(nn.Module):
             nn.ReLU(),
             nn.Linear(1024,512),
             nn.ReLU(),
-            nn.Linear(512,257)
+            nn.Linear(512,216),
+            nn.ReLU(),
+            nn.Linear(216,200),
+            nn.ReLU(),
+            nn.Linear(200,128),
+            nn.ReLU(),
+            nn.Linear(128,80),
+            nn.ReLU(),
+            nn.Linear(80,10),
+            nn.ReLU(),
+            nn.Linear(10,1)
         )
+        
+
         #initializing the weights
         self._initialize_weights()
 
@@ -52,40 +72,36 @@ class WideDeep(nn.Module):
     def forward(self,product_id,user_id,year,month,day_of_week,hour):
 
         #lets insert some range of inputs 
-        if (product_id >= 0).all() and (product_id<self.config.num_product).all():
+        if not ((product_id >= 0).all() and (product_id<self.config.num_product).all()):
             warnings.warn("product id is out of bound")
 
-        if (user_id>=0).all() and (user_id<self.config.num_users).all():
+        if not ((user_id>=0).all() and (user_id<self.config.num_users).all()):
             warnings.warn("user id is out of bound")
 
-        #the year is different
-        #assert (year>=min_year).all() and  (year<=max_year).all(),"year is out of bound" 
-
-        if (month>=0).all() and (month<self.config.num_month).all():
+        if not ((month>=0).all() and (month<self.config.num_month).all()):
             warnings.warn("month is out of bound")
 
-        if(day_of_week>=0).all() and (day_of_week<self.config.num_day_week).all():
+        if not ((day_of_week>=0).all() and (day_of_week<self.config.num_day_week).all()):
             warnings.warn("day of week is out of bound")
 
-       # assert (hour>=0).all() and (hour<self.config.num_time_day).all(),"hour is out of bound"
 
        #lets assert that inputs are not nan
-        if not torch.isnan(product_id).any():
+        if torch.isnan(product_id).any():
             warnings.warn("there is a nan value in product id")
 
-        if not torch.isnan(user_id).any():
+        if torch.isnan(user_id).any():
             warnings.warn("there is a nan value in user id")
 
-        if not torch.isnan(year).any():
+        if torch.isnan(year).any():
             warnings.warn("there is a nan value in year")
 
-        if not torch.isnan(month).any():
+        if torch.isnan(month).any():
             warnings.warn("thre is a nan value in month")
 
-        if not torch.isnan(day_of_week).any():
+        if torch.isnan(day_of_week).any():
             warnings.warn("there is a nan value in day of week")
 
-        if not torch.isnan(hour).any():
+        if torch.isnan(hour).any():
             warnings.warn("there is a nan value in the hour")
 
         #emebedding the input
@@ -96,27 +112,14 @@ class WideDeep(nn.Module):
         day_week_embed=self.day_week_embed(day_of_week)
         time_day_embed=self.time_day_embed(hour)
 
-        #debug
-        #print("hello from inside model")
-        #print(product_id_embed.shape)
-        #print(user_id_embed.shape)
-        #print(year_embed.shape)
-        #print(time_day_embed.shape)
-
-        #feeding into wide
-        
-        #lets add more dims to the inputs
-        #product_id=product_id.unsqueeze(dim=1)
-        #user_id=user_id.unsqueeze(dim=1)
-
-        #display the input
-        print(f"product id:{product_id}")
-        print(f"user if:{user_id}")
-        print(f"year:{year}")
-        print(f"month :{month}")
-        print(f"day of week:{day_of_week}")
-        print(f"hour :{hour}")
-
+        #lets print out
+        # print("this is the embedding")
+        # print(product_id_embed)
+        # print(user_id_embed)
+        # print(year_embed)
+        # print(time_month_embed)
+        # print(day_week_embed)
+        # print(time_day_embed)
 
         wide_output=self.wide(torch.cat((product_id.float(),user_id.float()),dim=1))      #inputs are floats cause ouputs must be floats not torch long 
 
@@ -130,18 +133,11 @@ class WideDeep(nn.Module):
                 time_day_embed.view(time_day_embed.size(0),-1)
         ),dim=1)
 
-        #output shape of the input to the deep
-        #print("hello from model")
-        #print(deep_input.shape) 
-
-        #output of deep
-
         deep_output=self.deep(deep_input)   
 
-        #lets print the intermediate values
-        
-        print(f"wide-output: {wide_output}")
-        print(f"deep-output: {deep_output}")
+        #the intermediate values 
+        #print(f"wide intermediate values: {wide_output}")
+        #print(f"deep intermediate values {deep_output}")
                               
         return deep_output+wide_output  #didn't include sigmoid because am using torch bce with logits as loss
 
