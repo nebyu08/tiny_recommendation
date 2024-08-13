@@ -48,16 +48,28 @@ class WideDeep(nn.Module):
         self.deep=nn.Sequential(
             nn.Linear(config.embedding_dim*6,1024), #config.num_feature
             nn.ReLU(),
+            nn.Dropout(),
+
             nn.Linear(1024,512),
             nn.ReLU(),
+            nn.Dropout(),
+
             nn.Linear(512,216),
             nn.ReLU(),
+            nn.Dropout(),
+
             nn.Linear(216,200),
             nn.ReLU(),
+            nn.Dropout(),
+
             nn.Linear(200,128),
             nn.ReLU(),
+            nn.Dropout(),
+
             nn.Linear(128,80),
             nn.ReLU(),
+            nn.Dropout(),
+
             nn.Linear(80,10),
             nn.ReLU(),
             nn.Linear(10,1)
@@ -112,15 +124,6 @@ class WideDeep(nn.Module):
         day_week_embed=self.day_week_embed(day_of_week)
         time_day_embed=self.time_day_embed(hour)
 
-        #lets print out
-        # print("this is the embedding")
-        # print(product_id_embed)
-        # print(user_id_embed)
-        # print(year_embed)
-        # print(time_month_embed)
-        # print(day_week_embed)
-        # print(time_day_embed)
-
         wide_output=self.wide(torch.cat((product_id.float(),user_id.float()),dim=1))      #inputs are floats cause ouputs must be floats not torch long 
 
         #feeding into deep but the shapes needs to be adjusted
@@ -135,10 +138,6 @@ class WideDeep(nn.Module):
 
         deep_output=self.deep(deep_input)   
 
-        #the intermediate values 
-        #print(f"wide intermediate values: {wide_output}")
-        #print(f"deep intermediate values {deep_output}")
-                              
         return deep_output+wide_output  #didn't include sigmoid because am using torch bce with logits as loss
 
     #lets initialize the model
