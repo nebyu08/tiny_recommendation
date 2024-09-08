@@ -126,6 +126,14 @@ class WideDeep(nn.Module):
 
         wide_output=self.wide(torch.cat((product_id.float(),user_id.float()),dim=1))      #inputs are floats cause ouputs must be floats not torch long 
 
+        #before concatinating we have the following shape
+        print(f"product id embed: {product_id_embed.shape}")
+        print(f"user input embed: {user_id_embed.shape}")
+        print(f"year embed: {year_embed.shape}")
+        print(f"time of month: {time_month_embed.shape}")
+        print(f"day of week shape:{day_week_embed.shape}")
+        print(f"time of day embed: {time_day_embed.shape}")
+
         #feeding into deep but the shapes needs to be adjusted
         deep_input=torch.cat((
                 product_id_embed.view(product_id_embed.size(0),-1),
