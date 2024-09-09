@@ -40,7 +40,7 @@ templates = Jinja2Templates(directory="templates")
 
 class UserInput(BaseModel):
     productid:str
-    user_id:str
+    userid:str
     year:int
     month:int
     day_of_week:int
@@ -54,18 +54,18 @@ userid_encoder=joblib.load('UserId_encoder.pkl')
 def preprocess(input_data):
     #encode the 
     encoded_productid=productid_encoder.transform([input_data.productid])[0]
-    encoded_userid=userid_encoder.transform([input_data.user_id])[0]
+    encoded_userid=userid_encoder.transform([input_data.userid])[0]
 
-    preprocessed_data=[
-        encoded_productid,
-        encoded_productid,
-        input_data.year,
-        input_data.month,
-        input_data.day_of_week,
-        input_data.hour
-    ]
+    preprocessed_data={
+        "productid":torch.tensor([encoded_productid]),
+        "userid":torch.tensor([encoded_userid]),
+        "year":torch.tensor([input_data.year]),
+        "month":torch.tensor([input_data.month]),
+        "day_of_week":torch.tensor([input_data.day_of_week]),
+        "hour":torch.tensor(input_data.hour)
+    }
     
-    return torch.tensor([preprocessed_data])
+    return preprocessed_data
 
 #lets define the route
 @app.get("/")
@@ -81,15 +81,17 @@ async def read_item(request:Request,id:str):
 @app.post('/predict')
 async def predict(
     productid:str = Form(),
-    user_id:str= Form(),
+    userid:str= Form(),
     year: int = Form(),
     month:int = Form(),
     day_of_week:int =Form(),
     hour:int = Form()
 ):
+    
+    #type checking maybe
     inputData = UserInput(
         productid=productid,
-        userid=user_id,
+        userid=userid,
         year=year,
         month=month,
         day_of_week=day_of_week,
@@ -97,9 +99,26 @@ async def predict(
     )
 
     preprocessed_data=preprocess(inputData)
+
+    #lets unpack the
+    productid=preprocessed_data['productid']
+    userid=preprocessed_data['userid']
+    year=preprocessed_data['year']
+    month=preprocessed_data['month']
+    day_of_week=preprocessed_data['day_of_week']
+    hour=preprocessed_data['hour']
+
+
     #turn of the backpropagation
     with torch.no_grad():
-        prediction=model(preprocessed_data)
+        prediction=model(
+            productid,
+            userid,
+            year,
+            month,
+            day_of_week,
+            hour
+        )
     
     return HTMLResponse({"prediction":prediction.item()})
 

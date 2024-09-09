@@ -116,6 +116,10 @@ class WideDeep(nn.Module):
         if torch.isnan(hour).any():
             warnings.warn("there is a nan value in the hour")
 
+        #more debuggin code
+        print(f"product id type is: {product_id.dtype}")
+        print(f"user id type is: {user_id.dtype}")
+
         #emebedding the input
         product_id_embed=self.product_embed(product_id)
         user_id_embed=self.user_embed(user_id)
@@ -124,7 +128,7 @@ class WideDeep(nn.Module):
         day_week_embed=self.day_week_embed(day_of_week)
         time_day_embed=self.time_day_embed(hour)
 
-        wide_output=self.wide(torch.cat((product_id.float(),user_id.float()),dim=1))      #inputs are floats cause ouputs must be floats not torch long 
+        self.wide_output=self.wide(torch.cat((product_id.float(),user_id.float()),dim=1))      #inputs are floats cause ouputs must be floats not torch long 
 
         #before concatinating we have the following shape
         print(f"product id embed: {product_id_embed.shape}")
@@ -146,7 +150,7 @@ class WideDeep(nn.Module):
 
         deep_output=self.deep(deep_input)   
 
-        return deep_output+wide_output  #didn't include sigmoid because am using torch bce with logits as loss
+        return torch.sigmoid(deep_output+self.wide_output ) #didn't include sigmoid because am using torch bce with logits as loss
 
     #lets initialize the model
     def _initialize_weights(self):
